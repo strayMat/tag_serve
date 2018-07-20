@@ -13,6 +13,7 @@ path2model = 'pretrained/default_cnn.0.model'
 decode_config_dict = {'load_model_dir':path2model # load model file
                     }
 
+VERBOSE = True
 
 def get_model_api():
     '''Returns lambda function for API'''
@@ -26,7 +27,8 @@ def get_model_api():
     data.load_export(path2xpt)
     data.read_config(decode_config_dict)
     data.HP_gpu = torch.cuda.is_available()
-    #data.show_data_summary()
+    if VERBOSE:
+        data.show_data_summary()
     
     ## building model and inputing the weights
     model = build_model(data)

@@ -6,9 +6,11 @@ from flask_cors import CORS
 
 from serve import get_model_api # class to implement which loads the model and has predict and/or train functions
 
+#!!!!!TODO add argument like model archi and weights paths and verbosity (default paths would be pretrained light file)
+
 # define the app
 app = Flask(__name__)
-CORS(app) # cross-domain requests, allow everything by default TODO:WHAAAAT ???
+CORS(app) # cross-domain requests, allow everything by default 
 # loading once and for all the api
 model_api = get_model_api()
 

@@ -102,15 +102,65 @@ class Data:
         self.HP_momentum = 0
         self.HP_l2 = 1e-8
 
-    def show_data_summary(self):
+    def show_data_summary(self, deploy = False):
         print('**' * 20)
-        print("Data summary:")
-        print(" Tag Scheme: {}".format(self.tagScheme))
-        print(" Max sentence length: {}".format(self.MAX_SENTENCE_LENTGH))
-        print(" Number normalized: {}".format(self.number_normalized))
-        print(" Word Alphabet size: {}".format(self.word_alphabet_size))
-        print(" Char Alphabet size: {}".format(self.char_alphabet_size))
-        print(" Label Alphabet size: {}".format(self.label_alphabet_size))
+        print("----------Data summary:----------\n")
+
+        print(" HP_gpu: {}".format(self.HP_gpu))
+        print(" MAX_SENTENCE_LENTGH: {}".format(self.MAX_SENTENCE_LENTGH))
+        print(" number_normalized: {}".format(self.number_normalized))
+        print(" word_alphabet: {}".format(self.word_alphabet_size))
+        print(" char_alphabet_size: {}".format(self.char_alphabet_size))
+        print(" label_alphabet_size: {}".format(self.label_alphabet_size))
+        print(" load_model_dir: {}".format(self.load_model_dir))
+        
+        if not deploy:
+            print('\n')
+            print('I/O:')
+            print(" tagScheme: {}".format(self.tagScheme))
+            print(" train_dir: {}".format(self.train_dir))
+            print(" dev_dir: {}".format(self.dev_dir))
+            print(" test_dir: {}".format(self.test_dir))
+            print(" raw_dir: {}".format(self.raw_dir))
+            print(" dset_dir: {}".format(self.dset_dir))
+            print(" word_emb_dir: {}".format(self.word_emb_dir))
+            print(" char_emb_dir: {}".format(self.char_emb_dir))
+            print(" feature_emb_dirs: {}".format(self.feature_emb_dirs))
+            
+        print('\n')
+        print('Network:')
+        print(" word_feature_extractor: {}".format(self.word_feature_extractor))
+        print(" use_char: {}".format(self.use_char))
+        print(" char_feature_extractor: {}".format(self.char_feature_extractor))
+        print(" use_crf: {}".format(self.use_crf))
+        print('\n')
+        print('Network Hyperparameters:')
+        print(" word_emb_dim: {}".format(self.word_emb_dim))
+        print(" char_emb_dim: {}".format(self.char_emb_dim))
+        print(" feature_emb_dims: {}".format(self.feature_emb_dims))
+        print(" HP_char_hidden_dim: {}".format(self.HP_char_hidden_dim))
+        print(" HP_hidden_dim: {}".format(self.HP_hidden_dim))
+        print(" HP_lstm_layer: {}".format(self.HP_lstm_layer))
+        print(" HP_bilstm: {}".format(self.HP_bilstm))
+        print(" HP_cnn_layer: {}".format(self.HP_cnn_layer))
+        print(" HP_dropout: {}".format(self.HP_dropout))
+        
+        if not deploy:
+            print('\n')
+            print('Training Hyperparameters:')
+            print(" average_batch_loss: {}".format(self.average_batch_loss))
+            print(" optimizer: {}".format(self.optimizer))
+            print(" iteration: {}".format(self.iteration))
+            print(" batch_size: {}".format(self.batch_size))
+            print(" HP_lr: {}".format(self.HP_lr))
+            print(" HP_lr_decayr: {}".format(self.HP_lr_decay))
+            print(" HP_clip: {}".format(self.HP_clip))
+            print(" HP_momentum: {}".format(self.HP_momentum))
+            print(" HP_l2: {}".format(self.HP_l2))
+
+        print('**' * 20 + '\n')
+
+
         # to be continued
 
     # read_isntances
