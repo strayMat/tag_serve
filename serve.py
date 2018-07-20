@@ -7,8 +7,8 @@ from nermodel.ner_model import build_model, evaluate
 
 import nltk
 
-path2xpt = 'pretrained/default_cnn.xpt'
-path2model = 'pretrained/default_cnn.0.model'
+path2xpt = 'pretrained/baseline.xpt'
+path2model = 'pretrained/baseline.model'
 
 decode_config_dict = {'load_model_dir':path2model # load model file
                     }

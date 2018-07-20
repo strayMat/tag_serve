@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+#from __future__ import absolute_import
 ### Main functions to wrap the ner model 
 
 import time

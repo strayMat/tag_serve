@@ -1,3 +1,6 @@
-.ipynb_checkpoints/
-pretrained/
+.ipynb_checkpoints
+/pretrained/*
+!/pretrained/baseline.model
+!/pretrained/baseline.xpt
 *.zip
+/prod_data
