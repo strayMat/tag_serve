@@ -28,7 +28,7 @@ def get_model_api():
     data.read_config(decode_config_dict)
     data.HP_gpu = torch.cuda.is_available()
     if VERBOSE:
-        data.show_data_summary()
+        data.show_data_summary(deploy = True)
     
     ## building model and inputing the weights
     model = build_model(data)
