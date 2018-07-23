@@ -407,6 +407,10 @@ def train(data):
         speed, acc, p, r, f, _, _ = evaluate(data, model, "dev")
         dev_finish = time.time()
         dev_cost = dev_finish - epoch_finish
+        # saving dev results json for model analysis
+        dev_res = tuple((speed, acc, p, r, f))
+        path2info = data.model_dir + '.infos'
+        save_infos(data, test_res, path2info)
 
         if data.seg:
             current_score = f
@@ -417,11 +421,6 @@ def train(data):
 
         # decode test
         speed, acc, p, r, f, _, _ = evaluate(data, model, 'test')
-        # saving test results json for model analysis
-        test_res = tuple((speed, acc, p, r, f))
-        path2info = data.model_dir + '.infos'
-        save_infos(data, test_res, path2info)
-
         test_finish = time.time()
         test_cost = test_finish - dev_finish
         if data.seg:
@@ -441,7 +440,8 @@ def train(data):
             best_dev = current_score
 
         gc.collect()
-
+    print('Training done!')
+    return best_dev
 
 def save_infos(data, test_res, path2info):
     ''' save informations of interest for model analysis
@@ -464,13 +464,13 @@ def save_infos(data, test_res, path2info):
         infos[k] = {}
         for param in v:
             infos[k][param] = res_dict[param]
-    # input results in infos dict
-    infos['test_res'] = {}
-    infos['test_res']['speed'] = test_res[0]
-    infos['test_res']['acc'] = test_res[1]
-    infos['test_res']['precision'] = test_res[2]
-    infos['test_res']['recall'] = test_res[3]
-    infos['test_res']['f1'] = test_res[4]
+    # input dev results in infos dict
+    infos['dev_res'] = {}
+    infos['dev_res']['speed'] = test_res[0]
+    infos['dev_res']['acc'] = test_res[1]
+    infos['dev_res']['precision'] = test_res[2]
+    infos['dev_res']['recall'] = test_res[3]
+    infos['dev_res']['f1'] = test_res[4]
     with open(path2info, 'w') as f:
         json.dump(infos, f)
 
