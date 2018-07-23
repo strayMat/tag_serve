@@ -4,3 +4,6 @@
 !/pretrained/baseline.xpt
 *.zip
 /prod_data
+__pycache_
+
+*/__pycache___

@@ -22,9 +22,9 @@ class WordSequence(nn.Module):
 		self.input_size = data.word_emb_dim
 		if self.use_char:
 			self.input_size += data.HP_char_hidden_dim
-			
 			if data.char_feature_extractor == "ALL":
 				self.input_size += data.HP_char_hidden_dim
+		
 		for idx in range(data.feature_num):
 			self.input_size += data.feature_emb_dims[idx]
 		
@@ -54,7 +54,7 @@ class WordSequence(nn.Module):
 				self.cnn_batchnorm_list.append(nn.BatchNorm1d(data.HP_hidden_dim))
 		self.hidden2tag = nn.Linear(data.HP_hidden_dim, data.label_alphabet_size)
 
-			# send appropriate layers to cuda in case of gpu (in fact all layers are send to gpu, even lstm)
+		# send appropriate layers to cuda in case of gpu (in fact all layers are send to gpu, even lstm)
 		if self.gpu:
 			self.droplstm = self.droplstm.cuda()
 			self.hidden2tag = self.hidden2tag.cuda()

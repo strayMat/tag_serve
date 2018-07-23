@@ -18,15 +18,14 @@ class WordRep(nn.Module) :
 		print("Build word representation...")
 		self.gpu = data.HP_gpu
 		self.use_char = data.use_char
-		self.batch_size = data.HP_batch_size
+		self.batch_size = data.batch_size
 		self.char_hidden_dim = 0
 		self.char_all_feature = False
 		if self.use_char:
 			self.char_hidden_dim = data.HP_char_hidden_dim
 			self.char_embedding_dim = data.char_emb_dim
 			if data.char_feature_extractor == "CNN":
-				#### I changed the char_alphabet size but it is .size() in the original code, very strange
-				self.char_feature = CharCNN(data.char_alphabet_size, data.pretrain_char_embedding, self.char_embedding_dim, self.char_hidden_dim, data.HP_dropout, self.gpu)
+				self.char_feature = CharCNN(data.char_alphabet.size(), data.pretrain_char_embedding, self.char_embedding_dim, self.char_hidden_dim, data.HP_dropout, self.gpu)
 				''' TODO IMPLEMENT LSTM AND GRU cells for character embeddings
 			elif data.char_feature_extractor == "LSTM":
 				self.char_feature = CharBiLSTM(data.char_alphabet.size(), data.pretrain_char_embedding, self. char_embedding_dim, semf.char_hidden_dim, data.HP_dropout, self.gpu)
@@ -44,14 +43,12 @@ class WordRep(nn.Module) :
 
 		self.embedding_dim = data.word_emb_dim
 		self.drop = nn.Dropout(data.HP_dropout)
-		#### I changed the word_alphabet size but it is .size() in the original code, very strange
-		self.word_embedding = nn.Embedding(data.word_alphabet_size, self.embedding_dim)
+		self.word_embedding = nn.Embedding(data.word_alphabet.size(), self.embedding_dim)
 		
 		if data.pretrain_word_embedding is not None:
 			self.word_embedding.weight.data.copy_(torch.from_numpy(data.pretrain_word_embedding))
 		else:
-			#### I changed the char_alphabet size but it is .size() in the original code, very strange
-			self.word_embedding.weight.data.copy_(torch.from_numpy(self.random_embedding(data.word_alphabet_size, self.embedding_dim)))
+			self.word_embedding.weight.data.copy_(torch.from_numpy(self.random_embedding(data.word_alphabet.size(), self.embedding_dim)))
 
 		
 		self.feature_num = data.feature_num
@@ -63,7 +60,7 @@ class WordRep(nn.Module) :
 			if data.pretrain_feature_embeddings[idx] is not None:
 				self.feature_embeddings[idx].weight.data.copy_(torch.from_numpy(data.pretrain_feature_embeddings[idx]))
 			else:
-				self.feature_embeddings[idx].weight.data.copy_(torch.from_numpy(self.random_embedding(data.feature_alphabets[idx].size(),self.feature_embedding_dims[idx])))
+				self.feature_embeddings[idx].weight.data.copy_(torch.from_numpy(self.random_embedding(data.feature_alphabets[idx].size(), self.feature_embedding_dims[idx])))
 		
 
 		if self.gpu:
@@ -98,7 +95,6 @@ class WordRep(nn.Module) :
 		sent_len = word_inputs.size(1)
 		word_embs = self.word_embedding(word_inputs)
 		word_list = [word_embs]
-		
 		for idx in range(self.feature_num):
 			word_list.append(self.feature_embeddings[idx](feature_inputs[idx]))
 		
@@ -119,9 +115,9 @@ class WordRep(nn.Module) :
 				char_features_extra = char_feature_extra.view(batch_size_len, -1)
 				word_list.append(char_features_extra)
 
-			word_embs = torch.cat(word_list, 2)
-			word_represent = self.drop(word_embs)
-			return word_represent
+		word_embs = torch.cat(word_list, 2)
+		word_represent = self.drop(word_embs)
+		return word_represent
 
 
 

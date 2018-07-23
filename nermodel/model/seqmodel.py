@@ -35,15 +35,15 @@ class SeqModel(nn.Module):
             self.crf = CRF(label_size, self.gpu)
     
     
-    def neg_log_likelihood(self, word_inputs, features_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover, batch_label, mask):
+    def neg_log_likelihood_loss(self, word_inputs, features_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover, batch_label, mask):
         outs = self.word_hidden(
-            word_inputs, features_inputs, word_seq_lentgths, char_inputs, char_seq_lengths, char_seq_recover)
-        batch_size = word_inputs.batch_size(0)
+            word_inputs, features_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover)
+        batch_size = word_inputs.size(0)
         seq_len = word_inputs.size(1)
         
         if self.use_crf:
             total_loss = self.crf.neg_log_likelihood_loss(outs, mask, batch_label)
-            scores, tag_seq = self._viterbi_decode(outs, mask)
+            scores, tag_seq = self.crf._viterbi_decode(outs, mask)
         else:
             loss_function = nn.NLLLoss(ignore_index=0, size_average=False)
             outs = outs.view(batch_size * seq_len, -1)
@@ -55,9 +55,9 @@ class SeqModel(nn.Module):
             total_loss = total_loss / batch_size
         return total_loss, tag_seq
 
-    def forward(self, word_inputs, features_inputs, word_seq_legnths, char_inputs, char_seq_lengths, char_seq_recover, mask):
+    def forward(self, word_inputs, features_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover, mask):
         outs = self.word_hidden(
-            word_inputs, features_inputs, word_seq_legnths, char_inputs, char_seq_lengths, char_seq_recover)
+            word_inputs, features_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover)
         batch_size = word_inputs.size(0)
         seq_len = word_inputs.size(1)
         if self.use_crf:

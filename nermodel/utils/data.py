@@ -27,12 +27,11 @@ class Data:
         self.feature_name = []
         self.feature_alphabets = []
         self.feature_num = len(self.feature_alphabets)
-        self.feat_config = None 
-        
+        self.feat_config = None
 
         self.label_alphabet = Alphabet('label', True)
-        self.tagScheme = 'NoSeg'  # BMES/BIO (remplacer par du BIO)
-        
+        self.tagScheme = 'NoSeg'
+
         self.seg = True
 
         # IO
@@ -43,7 +42,7 @@ class Data:
 
         self.decode_dir = None
         self.dset_dir = None  # data vocabulary related file
-        self.model_dir = None # model save file
+        self.model_dir = None  # model save file
         self.load_model_dir = None  # model load file
 
         self.word_emb_dir = None
@@ -72,16 +71,14 @@ class Data:
         self.norm_feature_embs = []
         self.word_emb_dim = 50
         self.char_emb_dim = 30
-
         # Networks
         self.word_feature_extractor = "LSTM"  # LSTM/CNN/GRU
         self.use_char = True
         self.char_feature_extractor = "CNN"  # LSTM/**CNN**/GRU
         self.use_crf = True
+        self.use_feats = False
         self.nbest = None
-
-        # Training (not necessary for deployment but it could be useful if we
-        # want to re-train models with an api)
+        # Train
         self.average_batch_loss = False
         self.optimizer = "SGD"
         self.status = "train"
@@ -102,7 +99,7 @@ class Data:
         self.HP_momentum = 0
         self.HP_l2 = 1e-8
 
-    def show_data_summary(self, deploy = False):
+    def show_data_summary(self, deploy=False):
         print('**' * 20)
         print("----------Data summary:----------\n")
 
@@ -113,7 +110,7 @@ class Data:
         print(" char_alphabet_size: {}".format(self.char_alphabet_size))
         print(" label_alphabet_size: {}".format(self.label_alphabet_size))
         print(" load_model_dir: {}".format(self.load_model_dir))
-        
+
         if not deploy:
             print('\n')
             print('I/O:')
@@ -126,7 +123,7 @@ class Data:
             print(" word_emb_dir: {}".format(self.word_emb_dir))
             print(" char_emb_dir: {}".format(self.char_emb_dir))
             print(" feature_emb_dirs: {}".format(self.feature_emb_dirs))
-            
+
         print('\n')
         print('Network:')
         print(" word_feature_extractor: {}".format(self.word_feature_extractor))
@@ -144,7 +141,7 @@ class Data:
         print(" HP_bilstm: {}".format(self.HP_bilstm))
         print(" HP_cnn_layer: {}".format(self.HP_cnn_layer))
         print(" HP_dropout: {}".format(self.HP_dropout))
-        
+
         if not deploy:
             print('\n')
             print('Training Hyperparameters:')
@@ -159,9 +156,6 @@ class Data:
             print(" HP_l2: {}".format(self.HP_l2))
 
         print('**' * 20 + '\n')
-
-
-        # to be continued
 
     # read_isntances
     def generate_instance(self, name):
@@ -185,16 +179,96 @@ class Data:
     def generate_instance_from_list(self, input_data):
         self.fix_alphabet()
         # input in raw data
-        self.raw_texts, self.raw_Ids = read_instance_from_list(input_data, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENTGH)
+        self.raw_texts, self.raw_Ids = read_instance_from_list(
+            input_data, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENTGH)
 
     def fix_alphabet(self):
         self.word_alphabet.close()
         self.char_alphabet.close()
         self.label_alphabet.close()
-        
+
         for idx in range(self.feature_num):
             self.feature_alphabets[idx].close()
-        
+
+    def initial_feature_alphabets(self):
+        items = open(self.train_dir, 'r').readline().strip('\n').split()
+        total_column = len(items)
+        if total_column > 2:
+            for idx in range(1, total_column - 1):
+                feature_prefix = items[idx].split(']', 1)[0] + ']'
+                self.feature_alphabets.append(Alphabet(feature_prefix))
+                self.feature_name.append(feature_prefix)
+                print("Find feature: {}".format(feature_prefix))
+        self.feature_num = len(self.feature_alphabets)
+        self.pretrain_feature_embeddings = [None] * self.feature_num
+        self.feature_emb_dims = [20] * self.feature_num
+        self.feature_emb_dirs = [None] * self.feature_num
+        self.norm_feature_embs = [False] * self.feature_num
+        self.feature_alphabet_sizes = [0] * self.feature_num
+        if self.feat_config:
+            for idx in range(self.feature_num):
+                if self.feature_name[idx] in self.feat_config:
+                    self.feature_emb_dims[idx] = self.feat_config[
+                        self.feature_name[idx]]['emb_size']
+                    self.feature_emb_dirs[idx] = self.feat_config[
+                        self.feature_name[idx]]['emb_dir']
+                    self.norm_emb_embs[idx] = self.feat_config[
+                        self.feature_name[idx]]['emb_norm']
+
+    def build_alphabet(self, input_file):
+        in_lines = open(input_file, 'r').readlines()
+        for line in in_lines:
+            if len(line) > 2:
+                pairs = line.strip().split()
+                word = pairs[0]
+                if self.number_normalized:
+                    word = normalize_word(word)
+                label = pairs[-1]
+                self.label_alphabet.add(label)
+                self.word_alphabet.add(word)
+                # build feautre alphabet
+                for idx in range(self.feature_num):
+                    feat_idx = pairs[idx + 1].split(']', 1)[-1]
+                    self.feature_alphabets[idx].add(feat_idx)
+                # build char alphabet
+                for char in word:
+                    self.char_alphabet.add(char)
+        self.word_alphabet_size = self.word_alphabet.size()
+        self.char_alphabet_size = self.char_alphabet.size()
+        self.label_alphabet_size = self.label_alphabet.size()
+        for idx in range(self.feature_num):
+            self.feature_alphabet_sizes[
+                idx] = self.feature_alphabets[idx].size()
+        startS = False
+        startB = False
+        for label, _ in self.label_alphabet.iteritems():
+            if "S-" in label.upper():
+                startS = True
+            elif "B-" in label.upper():
+                startB = True
+        if startB:
+            if startS:
+                self.tagScheme = "BMES"
+            else:
+                self.tagScheme = "BIO"
+
+    def build_pretrain_emb(self):
+        if self.word_emb_dir:
+            print("Load pretrained word embedding, norm {}, dir: {}".format(
+                self.norm_word_emb, self.word_emb_dir))
+            self. pretrain_word_embedding, self.word_emb_dim = build_pretrain_embedding(
+                self.word_emb_dir, self.word_alphabet, self.word_emb_dim, self.norm_word_emb)
+        if self.char_emb_dir:
+            print("Load pretrained char embedding, norm {}, dir: {}".format(
+                self.norm_char_emb, self.char_emb_dir))
+            self. pretrain_char_embedding, self.char_emb_dim = build_pretrain_embedding(
+                self.char_emb_dir, self.char_alphabet, self.char_emb_dim, self.norm_char_emb)
+        for idx in range(self.feature_num):
+            if self.feature_emb_dirs[idx]:
+                print("Load pretrained feature embedding, norm {}, dir: {}".format(
+                    self.norm_feature_embs[idx], self.feature_emb_dirs[idx]))
+                self. pretrain_feature_embeddings[idx], self.feature_emb_dims[idx] = build_pretrain_embedding(
+                    self.feature_emb_dirs[idx], self.feature_alphabets[idx], self.feature_emb_dirs[idx], self.norm_feature_embs[idx])
 
     # load dset file
     def load(self, data_file):
@@ -221,7 +295,7 @@ class Data:
         self.word_alphabet.from_json(tmp_dict['word_alphabet'])
         self.char_alphabet.from_json(tmp_dict['char_alphabet'])
         self.label_alphabet.from_json(tmp_dict['label_alphabet'])
-        
+
         tmp_dict['word_alphabet'] = self.word_alphabet
         tmp_dict['char_alphabet'] = self.char_alphabet
         tmp_dict['label_alphabet'] = self.label_alphabet
@@ -248,7 +322,7 @@ class Data:
                 exp_dict[k].from_json(v.get_content())
             else:
                 exp_dict[k] = v
-                
+
         # re-initialize un-useful informations (export should be light)
         exp_dict['word_alphabet'] = exp_dict['word_alphabet'].get_content()
         exp_dict['char_alphabet'] = exp_dict['char_alphabet'].get_content()
@@ -256,7 +330,7 @@ class Data:
 
         exp_dict['load_model_dir'] = None
         exp_dict['model_dir'] = None
-        
+
         exp_dict['train_dir'] = None
         exp_dict['test_dir'] = None
         exp_dict['dev_dir'] = None
@@ -280,8 +354,6 @@ class Data:
 
         with open(save_file, 'wb') as f:
             pickle.dump(exp_dict, f, 2)
-
-
 
     def read_config(self, config_file):
             # case we are reading a config file and not a python dictionnary
@@ -357,6 +429,9 @@ class Data:
         the_item = 'use_char'
         if the_item in config:
             self.use_char = str2bool(config[the_item])
+        the_item = 'use_feats'
+        if the_item in config:
+            self.use_feats == str2bool(config[the_item])
         the_item = 'word_seq_feature'
         if the_item in config:
             self.word_feature_extractor = config[the_item]
@@ -391,7 +466,7 @@ class Data:
             self.HP_iteration = int(config[the_item])
         the_item = 'batch_size'
         if the_item in config:
-            self.HP_batch_size = int(config[the_item])
+            self.batch_size = int(config[the_item])
 
         the_item = 'char_hidden_dim'
         if the_item in config:
@@ -427,9 +502,10 @@ class Data:
         the_item = 'l2'
         if the_item in config:
             self.HP_l2 = float(config[the_item])
-
+        
 
 def str2bool(string):
+    string = str(string)
     if string == 'True' or string == 'true' or string == 'TRUE':
         return True
     else:

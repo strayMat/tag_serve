@@ -58,7 +58,7 @@ class Alphabet:
 
 	def size(self):
 		# is it -1 instead of ncrfpp code + 1 
-		return len(self.instances) - 1
+		return len(self.instances) + 1
 
 	def iteritems(self):
 		if sys.version_info[0] < 3:# if python < 3 , diferent access to items

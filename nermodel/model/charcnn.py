@@ -40,6 +40,7 @@ class CharCNN(nn.Module):
 			Note it only accepts ordered (length) variable, legnth size is recored in seq_lengths
 		'''
 		batch_size = input.size(0)
+		#print(input.size())
 		char_embeds = self.char_drop(self.char_embeddings(input))
 		char_embeds = char_embeds.transpose(2,1).contiguous()
 		char_cnn_out = self.char_cnn(char_embeds)
