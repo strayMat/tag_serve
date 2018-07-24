@@ -12,7 +12,8 @@ def myTrain(confdict):
 	data.generate_instance('dev')
 	data.generate_instance('test')
 	data.build_pretrain_emb()
-	train(data)
+	f1 = train(data)
+	return f1
 
 # decoding with a test file containing labels (test purpose usually)
 def myDecode(confdict, verbose=True):
