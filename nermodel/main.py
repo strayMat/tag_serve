@@ -1,8 +1,8 @@
 from utils.data import Data
-from ner_model import train, data_initialization
+from ner_model import train, data_initialization, load_model_decode
 import torch
 
-def mytrain(confdict):
+def myTrain(confdict):
 	print('Model Train')
 	data = Data()
 	data.read_config(confdict)
