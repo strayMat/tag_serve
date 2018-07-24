@@ -340,10 +340,10 @@ def train(data):
         exit(1)
     best_dev = -10
     ## start training
-    for idx in range(data.HP_iteration):
+    for idx in range(data.iteration):
         epoch_start = time.time()
         temp_start = epoch_start
-        print("Epoch {}/{}".format(idx,data.HP_iteration))
+        print("Epoch {}/{}".format(idx,data.iteration))
         if data.optimizer.lower() == 'sgd':
             optimizer = lr_decay(optimizer, idx, data.HP_lr_decay, data.HP_lr)
         instance_count = 0
@@ -452,7 +452,7 @@ def save_infos(data, test_res, path2info):
     'archi':['use_crf', 'HP_hidden_dim', 'HP_char_hidden_dim', 'HP_lstm_layer',
              'HP_bilstm', 'HP_cnn_layer', 'HP_dropout', 'word_emb_dim', 'char_emb_dim'],
     
-    'train': ['batch_size', 'HP_iteration', 'optimizer', 'HP_lr', 'HP_lr_decay', 'HP_momentum', 'HP_l2','HP_clip'],
+    'train': ['batch_size', 'iteration', 'optimizer', 'HP_lr', 'HP_lr_decay', 'HP_momentum', 'HP_l2','HP_clip'],
     
     'others':['MAX_SENTENCE_LENTGH', 'HP_gpu', 'number_normalized']
     }

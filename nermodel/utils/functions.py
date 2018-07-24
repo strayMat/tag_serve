@@ -75,7 +75,6 @@ def read_instance(input_file, word_alphabet, char_alphabet, label_alphabet, feat
 		## case blankline (end of sentence / instance), here it sets aside the sentences too long (len >= max_sent_length)
 		else:
 			if (len(words) > 0) and ((max_sent_length < 0) or (len(words) < max_sent_length)):
-				# suppressed features and feature_Ids from these lists
 				instance_texts.append([words, chars, features, labels])
 				instance_Ids.append([word_Ids, char_Ids, features_Ids, label_Ids])
 			words = []

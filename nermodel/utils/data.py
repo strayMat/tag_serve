@@ -270,6 +270,33 @@ class Data:
                 self. pretrain_feature_embeddings[idx], self.feature_emb_dims[idx] = build_pretrain_embedding(
                     self.feature_emb_dirs[idx], self.feature_alphabets[idx], self.feature_emb_dirs[idx], self.norm_feature_embs[idx])
 
+    def write_decoded_results(self, predict_results, name):
+        ''' Write predicted results in a given file (to the conll format)
+        '''
+        fout = open(self.decode_dir, 'w')
+        sent_num = len(predict_results)
+        content_list = []
+        if name == 'raw':
+            content_list = self.raw_texts
+        elif name = 'test':
+            content_list = self.test_texts
+        elif name = 'dev':
+            content_list = self.dev_texts
+        elif name == 'train':
+            content_list = self.train_texts
+        else:
+            print('Error: Please use a name in raw/train/dev/test ! ')
+        assert(sent_num == len(content_list))
+        for idx in range(sent_num):
+            sent_length = len(predict_results[idx])
+            for idy in range(sent_length):
+                # content_list[idx] is a list of [word, char, features, label]
+                fout.write(content_list[idx][0][idy].encode('utf-8') + ' ' + predict_results[idx][idy] + '\n')
+            fout.write('\n')
+        fout.close()
+        print('Predict {} result has been written into file {}'.format(name, self.decode_dir))
+
+
     # load dset file
     def load(self, data_file):
         f = open(data_file, 'rb')
@@ -354,6 +381,7 @@ class Data:
 
         with open(save_file, 'wb') as f:
             pickle.dump(exp_dict, f, 2)
+
 
     def read_config(self, config_file):
             # case we are reading a config file and not a python dictionnary
@@ -463,7 +491,7 @@ class Data:
             self.HP_cnn_layer = int(config[the_item])
         the_item = 'iteration'
         if the_item in config:
-            self.HP_iteration = int(config[the_item])
+            self.iteration = int(config[the_item])
         the_item = 'batch_size'
         if the_item in config:
             self.batch_size = int(config[the_item])
