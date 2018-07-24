@@ -305,13 +305,13 @@ def evaluate(data, model, name, nbest=None, label_flag=True):
         
         pred_results += pred_label
 
-        decode_time = time.time() - start_time
-        speed = len(instances)/decode_time
-        if label_flag:
-            acc, p, r, f = get_ner_fmeasure(gold_results, pred_results, data.tagScheme)
-        else:
-            acc, p, r, f = (0,0,0,0)
-        return speed, acc, p, r, f, pred_results, pred_scores
+    decode_time = time.time() - start_time
+    speed = len(instances)/decode_time
+    if label_flag:
+        acc, p, r, f = get_ner_fmeasure(gold_results, pred_results, data.tagScheme)
+    else:
+        acc, p, r, f = (0,0,0,0)
+    return speed, acc, p, r, f, pred_results, pred_scores
 
 
 def train(data):
@@ -410,7 +410,7 @@ def train(data):
         # saving dev results json for model analysis
         dev_res = tuple((speed, acc, p, r, f))
         path2info = data.model_dir + '.infos'
-        save_infos(data, test_res, path2info)
+        save_infos(data, dev_res, path2info)
 
         if data.seg:
             current_score = f

@@ -1,9 +1,10 @@
 .ipynb_checkpoints
+# allow baseline models
 /pretrained/*
 !/pretrained/baseline.model
 !/pretrained/baseline.xpt
 *.zip
 /prod_data
-__pycache_
 
-*/__pycache___
+*/__pycache__/
+__pycache__/_

@@ -278,9 +278,9 @@ class Data:
         content_list = []
         if name == 'raw':
             content_list = self.raw_texts
-        elif name = 'test':
+        elif name == 'test':
             content_list = self.test_texts
-        elif name = 'dev':
+        elif name == 'dev':
             content_list = self.dev_texts
         elif name == 'train':
             content_list = self.train_texts
@@ -291,7 +291,11 @@ class Data:
             sent_length = len(predict_results[idx])
             for idy in range(sent_length):
                 # content_list[idx] is a list of [word, char, features, label]
-                fout.write(content_list[idx][0][idy].encode('utf-8') + ' ' + predict_results[idx][idy] + '\n')
+                # for python 2
+                if sys.version_info[0] < 3:
+                    fout.write(content_list[idx][0][idy].encode('utf-8') + ' ' + predict_results[idx][idy] + '\n')
+                else:
+                    fout.write(content_list[idx][0][idy] + ' ' + predict_results[idx][idy] + '\n')
             fout.write('\n')
         fout.close()
         print('Predict {} result has been written into file {}'.format(name, self.decode_dir))
