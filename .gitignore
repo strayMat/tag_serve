@@ -7,4 +7,6 @@
 /prod_data
 
 */__pycache__/
-__pycache__/_
+__pycache__/
+processed/
+
