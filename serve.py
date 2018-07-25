@@ -36,19 +36,22 @@ def get_model_api():
     print("Model loaded in {:.2}s".format(load_end))
     print('**' * 30)
 
-    def model_api(input_data, data = data, model = model):
+    def model_api(input_data, data = data, model = model, live = True, tokenizer = None):
         # 2. Make prediction given an input_data
+        if tokenizer == None:
+            print('EMPTY TOKENIZER! please specify a tokenizer...')
+            exit(1)
         
         ## Pre-processing from client 
-        sentences = nltk.sent_tokenize(input_data)
+        text = tokenizer(input_data)
         input_client = []
         input_model = []
-        for sent in sentences:
-            tokens = nltk.word_tokenize(sent)
+        for sent in text.sents:
+            sentence = [token.string.strip() for token in sent]
             # we have to keep a sequence wo '' sentences separators for the client output
-            input_client += tokens
-            input_model += tokens + ['']
-        
+            input_client += sentence
+            input_model += sentence + ['']
+        print()
         start_time = time.time()
         #print(feed_data)
         data.generate_instance_from_list(input_model)
@@ -62,13 +65,16 @@ def get_model_api():
         print('Processing time {:.2} s'.format(timed))
         print('Decoding speed: {0:.2f} st/s'.format(speed))
         # reconstruct a unique sequence for the client
-        output_client = []
-        for l in pred_results:
-            output_client += l
-        output_aligned = align_data({'raw_input': input_client, 'labels':output_client})
-        
-        return output_aligned['raw_input'], output_aligned['labels']
-        
+        if live: 
+            output_client = []
+            for l in pred_results:
+                output_client += l
+            output_aligned = align_data({'raw_input': input_client, 'labels':output_client})
+            # return two aligned string sequences 
+            return output_aligned['raw_input'], output_aligned['labels']
+        else:
+            # return the original text as well as a list of sentences where each sentence is a list of prediction (nb_sentences, sent_length)
+            return input_data, pred_results
     return model_api
 
 
