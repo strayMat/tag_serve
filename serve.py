@@ -2,6 +2,7 @@
 #from model.config import Config
 import time
 import torch
+import re
 from nermodel.utils.data import Data
 from nermodel.ner_model import build_model, evaluate
 
@@ -47,7 +48,7 @@ def get_model_api():
         input_client = []
         input_model = []
         for sent in text.sents:
-            sentence = [token.string.strip() for token in sent]
+            sentence = [re.sub('\t|\n', '<break>', token.string).strip() for token in sent]
             # we have to keep a sequence wo '' sentences separators for the client output
             input_client += sentence
             input_model += sentence + ['']
