@@ -11,7 +11,8 @@ from serve import get_model_api # class to implement which loads the model and h
 #!!!!!TODO add argument like model archi and weights paths and verbosity (default paths would be pretrained light file)
 VISU = True
 VISU_SAVE = True
-OUT_PATH = 'processed/'
+VISU_SERVE = True
+OUT_PATH = '../merlot_deid/results/compareMIMIC/torch_decode/'
 
 # define the app
 app = Flask(__name__)
@@ -22,7 +23,7 @@ model_api = get_model_api()
 
 # loading tokenizer once and for all for the api
 app.logger.info('Loading spacy tokenizer...')
-nlp = spacy.load('en', disable=['tagger', 'ner', 'parser'])
+nlp = spacy.load('fr', disable=['tagger', 'ner', 'parser'])
 nlp.add_pipe(nlp.create_pipe('sentencizer')) 
 
 #STATUS = 'live' # live/file
@@ -96,7 +97,8 @@ def file_api():
                     html = displacy.render(visu_data, style='ent', page=True, manual=True)
                     with open(path2html, 'w', encoding ='utf-8') as f:
                         f.write(html)
-                displacy.serve(visu_data, style='ent', manual=True, port=5001)
+                if VISU_SERVE:
+                    displacy.serve(visu_data, style='ent', manual=True, port=5001)
 
             ## !!!!!!!!!!!!!!what is the response ??? do we want to return the file and how ?? !!!!!!!!!!!!
             response = jsonify(input= input_data, output = out)
