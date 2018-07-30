@@ -468,10 +468,10 @@ class Data:
         the_item = 'use_feats'
         if the_item in config:
             self.use_feats == str2bool(config[the_item])
-        the_item = 'word_seq_feature'
+        the_item = 'word_feature_extractor'
         if the_item in config:
             self.word_feature_extractor = config[the_item]
-        the_item = 'char_seq_feature'
+        the_item = 'char_feature_extractor'
         if the_item in config:
             self.char_feature_extractor = config[the_item]
         the_item = 'nbest'
@@ -486,7 +486,7 @@ class Data:
         the_item = 'optimizer'
         if the_item in config:
             self.optimizer = config[the_item]
-        the_item = 'ave_batch_loss'
+        the_item = 'average_batch_loss'
         if the_item in config:
             self.average_batch_loss = str2bool(config[the_item])
         the_item = 'status'
@@ -494,7 +494,7 @@ class Data:
             self.status = config[the_item]
 
         # read Hyperparameters:
-        the_item = 'cnn_layer'
+        the_item = 'HP_cnn_layer'
         if the_item in config:
             self.HP_cnn_layer = int(config[the_item])
         the_item = 'iteration'
@@ -504,38 +504,38 @@ class Data:
         if the_item in config:
             self.batch_size = int(config[the_item])
 
-        the_item = 'char_hidden_dim'
+        the_item = 'HP_char_hidden_dim'
         if the_item in config:
             self.HP_char_hidden_dim = int(config[the_item])
-        the_item = 'hidden_dim'
+        the_item = 'HP_hidden_dim'
         if the_item in config:
             self.HP_hidden_dim = int(config[the_item])
-        the_item = 'dropout'
+        the_item = 'HP_dropout'
         if the_item in config:
             self.HP_dropout = float(config[the_item])
-        the_item = 'lstm_layer'
+        the_item = 'HP_lstm_layer'
         if the_item in config:
             self.HP_lstm_layer = int(config[the_item])
-        the_item = 'bilstm'
+        the_item = 'HP_bilstm'
         if the_item in config:
             self.HP_bilstm = str2bool(config[the_item])
 
-        the_item = 'gpu'
+        the_item = 'HP_gpu'
         if the_item in config:
             self.HP_gpu = str2bool(config[the_item])
-        the_item = 'learning_rate'
+        the_item = 'HP_lr'
         if the_item in config:
             self.HP_lr = float(config[the_item])
-        the_item = 'lr_decay'
+        the_item = 'HP_lr_decay'
         if the_item in config:
             self.HP_lr_decay = float(config[the_item])
-        the_item = 'clip'
+        the_item = 'HP_clip'
         if the_item in config:
             self.HP_clip = float(config[the_item])
-        the_item = 'momentum'
+        the_item = 'HP_momentum'
         if the_item in config:
             self.HP_momentum = float(config[the_item])
-        the_item = 'l2'
+        the_item = 'HP_l2'
         if the_item in config:
             self.HP_l2 = float(config[the_item])
         
