@@ -42,6 +42,7 @@ class Data:
 
         self.decode_dir = None
         self.dset_dir = None  # data vocabulary related file
+        self.xpt_dir = None # architecture and vocabulary (light replacement of dset)
         self.model_dir = None  # model save file
         self.load_model_dir = None  # model load file
 
@@ -413,6 +414,9 @@ class Data:
         the_item = 'dset_dir'
         if the_item in config:
             self.dset_dir = config[the_item]
+        the_item = 'xpt_dir'
+        if the_item in config:
+            self.xpt_dir = config[the_item]
         the_item = 'model_dir'
         if the_item in config:
             self.model_dir = config[the_item]

@@ -20,7 +20,10 @@ def myDecode(confdict, verbose=True):
 	data = Data()
 	data.read_config(confdict)
 	print('Model Decode')
-	data.load(data.dset_dir)
+	try:
+		data.load(data.dset_dir)
+	except TypeError:
+		data.load_export(data.xpt_dir)
 	data.read_config(confdict)
 	data.HP_gpu = torch.cuda.is_available()
 	print('Decoding source: ', data.raw_dir)

@@ -6,10 +6,8 @@ import re
 from nermodel.utils.data import Data
 from nermodel.ner_model import build_model, evaluate
 
-import nltk
-
-path2xpt = '../merlot_deid/results/compareMIMIC/myModel/myModel.xpt'
-path2model = '../merlot_deid/results/compareMIMIC/myModel/myModel.37.model'
+path2xpt = 'pretrained/baseline.xpt'
+path2model = 'pretrained/baseline.model'
 
 decode_config_dict = {'load_model_dir':path2model # load model file
                     }
@@ -44,16 +42,13 @@ def get_model_api():
             exit(1)
         
         ## Pre-processing from client, very delicate (we have to keep the same tokenization for the model input and for the spans at the output
-        text = tokenizer(input_data)
+        text = tokenizer.tokenize(input_data)
         input_client = []
         input_model = []
         sentence = []
-        for sent in text.sents:
+        for sent in text:
             for token in sent:
-                w = re.sub('\t|\n', '<break>', token.string).strip()
-                if w == '': 
-                    w = '<space>'
-                #print(w)
+                w = token.string.strip()
                 sentence.append(w)
             input_client += sentence
             input_model += sentence + ['']

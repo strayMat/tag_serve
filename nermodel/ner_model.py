@@ -409,8 +409,7 @@ def train(data):
         dev_cost = dev_finish - epoch_finish
         # saving dev results json for model analysis
         dev_res = tuple((speed, acc, p, r, f))
-        path2info = data.model_dir + '.infos'
-        save_infos(data, dev_res, path2info)
+        
 
         if data.seg:
             current_score = f
@@ -438,12 +437,14 @@ def train(data):
             print('Save current best model in file:', model_name)
             torch.save(model.state_dict(), model_name)
             best_dev = current_score
+            path2info = data.model_dir + '.infos'
+            save_infos(data, dev_res, path2info)
 
         gc.collect()
     print('Training done!')
     return best_dev
 
-def save_infos(data, test_res, path2info):
+def save_infos(data, dev_res, path2info):
     ''' save informations of interest for model analysis
     '''
     HPOI = {
@@ -466,11 +467,11 @@ def save_infos(data, test_res, path2info):
             infos[k][param] = res_dict[param]
     # input dev results in infos dict
     infos['dev_res'] = {}
-    infos['dev_res']['speed'] = test_res[0]
-    infos['dev_res']['acc'] = test_res[1]
-    infos['dev_res']['precision'] = test_res[2]
-    infos['dev_res']['recall'] = test_res[3]
-    infos['dev_res']['f1'] = test_res[4]
+    infos['dev_res']['speed'] = dev_res[0]
+    infos['dev_res']['acc'] = dev_res[1]
+    infos['dev_res']['precision'] = dev_res[2]
+    infos['dev_res']['recall'] = dev_res[3]
+    infos['dev_res']['f1'] = dev_res[4]
     with open(path2info, 'w') as f:
         json.dump(infos, f)
 
