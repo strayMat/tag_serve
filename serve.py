@@ -6,18 +6,14 @@ import re
 from nermodel.utils.data import Data
 from nermodel.ner_model import build_model, evaluate
 
-path2xpt = 'pretrained/baseline.xpt'
-path2model = 'pretrained/baseline.model'
-
-decode_config_dict = {'load_model_dir':path2model # load model file
-                    }
-
 VERBOSE = True
 
-def get_model_api():
+def get_model_api(path2xpt, path2model):
     '''Returns lambda function for API'''
     # 1. Initialize model
     load_start = time.time()
+    decode_config_dict = {'load_model_dir':path2model, # model weights
+                            'xpt_dir':path2xpt}
 
     data = Data()
     print('**' * 30)
@@ -53,7 +49,7 @@ def get_model_api():
             input_client += sentence
             input_model += sentence + ['']
             sentence = []
-        print()
+        
         start_time = time.time()
         #print(feed_data)
         data.generate_instance_from_list(input_model)

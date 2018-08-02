@@ -29,7 +29,6 @@ class CharCNN(nn.Module):
 			pretrain_emb[index, :] = np.random.uniform(-scale, scale, [1, embedding_dim])
 		return pretrain_emb
 
-# why is it seq_lengths???????????????????
 	def get_last_hiddens(self, input, seq_lengths):
 		'''
 			input: 
@@ -47,7 +46,6 @@ class CharCNN(nn.Module):
 		char_cnn_out = F.max_pool1d(char_cnn_out, char_cnn_out.size(2)).view(batch_size, -1)
 		return char_cnn_out
 
-	# why is it seq_lengths???????????????????
 	def get_all_hiddens(self, input, seq_lengths):
 		'''
 			input: 

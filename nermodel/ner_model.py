@@ -11,6 +11,7 @@ import torch.autograd as autograd
 import torch.optim as optim
 import numpy as np
 
+#from model.seqmodel import SeqModel
 try:
     from model.seqmodel import SeqModel
 except:
@@ -115,7 +116,7 @@ def batchify_with_label(input_batch_list, gpu, volatile_flag=False, label_flag=T
             word_seq_lengths: (batch_size,  1) Tensor
             char_seq_tensor: (batch_size*max_sent_len, max_word_len) Variable
             char_seq_lengths: (batch_size*max_sent_len, 1) Tensor
-            char_seq_recover: (batch_size*max_sent_len, 1) recover char sequence order
+            char_seq_recover: (batch_size*max_sent_len, 1) recover char sequence order (neeeded because padd_sequ_length only accepts ordered sequences)
             mask: (batch_size, max_sent_len)
 
     """
