@@ -101,8 +101,6 @@ def build_model(data):
     time_cost = end_time - start_time
     return model
 
-#### volatile_flag and autograd.variable seem to be pytroch 3.1, maybe in a second pass, change all in pytorch 4.0
-## WHAT is mask, batch_wordrecover ??? to be understood
 def batchify_with_label(input_batch_list, gpu, volatile_flag=False, label_flag=True):
     """
         input: list of words, chars and labels, various length. [[words, chars, labels], [words, chars, labels],...] (watch out could also be with features in 2d pos)
@@ -135,16 +133,16 @@ def batchify_with_label(input_batch_list, gpu, volatile_flag=False, label_flag=T
     word_seq_lengths = torch.from_numpy(np.array(list(map(len, words)))).long()
     #print(word_seq_lengths.requires_grad)
     max_seq_len = word_seq_lengths.max()
-    word_seq_tensor = torch.zeros((batch_size, max_seq_len), dtype=torch.long, requires_grad = volatile_flag)
+    word_seq_tensor = torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag).long()
     
     ## to be returned anyway
     label_seq_tensor = []
     if label_flag:
-        label_seq_tensor = torch.zeros((batch_size, max_seq_len), dtype=torch.long, requires_grad = volatile_flag)
+        label_seq_tensor = torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag).long()
     
     feature_seq_tensors = []
     for idx in range(feature_num):
-        feature_seq_tensors.append(torch.zeros((batch_size, max_seq_len), dtype=torch.long, requires_grad = volatile_flag))
+        feature_seq_tensors.append(torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag)).long()
     
     mask = torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag).byte()
     if label_flag:
@@ -181,7 +179,7 @@ def batchify_with_label(input_batch_list, gpu, volatile_flag=False, label_flag=T
     length_list = [list(map(len, pad_char)) for pad_char in pad_chars]
     max_word_len = max(map(max, length_list))
     #print(batch_size, max_seq_len, max_word_len)
-    char_seq_tensor = torch.zeros((batch_size, max_seq_len, max_word_len), dtype = torch.long, requires_grad = volatile_flag)
+    char_seq_tensor = torch.zeros((batch_size, max_seq_len, max_word_len), requires_grad = volatile_flag).long()
     char_seq_lengths = torch.Tensor(length_list).long()
     for idx, (seq, seqlen) in enumerate(zip(pad_chars, char_seq_lengths)):
         for idy, (word, wordlen) in enumerate(zip(seq, seqlen)):
