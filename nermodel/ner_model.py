@@ -131,40 +131,38 @@ def batchify_with_label(input_batch_list, gpu, volatile_flag=False, label_flag=T
     features = [np.asarray(sent[2]) for sent in input_batch_list]
     feature_num = len(features[0][0])
     #feature_num = 0
-
-    word_seq_lengths = torch.LongTensor(list(map(len, words)))
+    #word_seq_lengths = torch.Tensor(list(map(len, words)), dtype=torch.long, requires_grad = False)
+    word_seq_lengths = torch.from_numpy(np.array(list(map(len, words)))).long()
+    #print(word_seq_lengths.requires_grad)
     max_seq_len = word_seq_lengths.max()
-    word_seq_tensor = autograd.Variable(torch.zeros((batch_size, max_seq_len)), volatile = volatile_flag).long()
-    ## change all variable as the following lines to upgrade to torch 4.0 (not sure that all will be working but this is a beginning for the shiftto torch 4.0)
-    #word_seq_tensor = autograd.Variable(torch.zeros((batch_size, max_seq_len)), requires_grad = volatile_flag).long()
+    word_seq_tensor = torch.zeros((batch_size, max_seq_len), dtype=torch.long, requires_grad = volatile_flag)
     
     ## to be returned anyway
     label_seq_tensor = []
     if label_flag:
-        label_seq_tensor = autograd.Variable(torch.zeros((batch_size, max_seq_len)), volatile = volatile_flag).long()
+        label_seq_tensor = torch.zeros((batch_size, max_seq_len), dtype=torch.long, requires_grad = volatile_flag)
     
     feature_seq_tensors = []
     for idx in range(feature_num):
-        feature_seq_tensors.append(autograd.Variable(torch.zeros((batch_size, max_seq_len)), volatile = volatile_flag).long())
+        feature_seq_tensors.append(torch.zeros((batch_size, max_seq_len), dtype=torch.long, requires_grad = volatile_flag))
     
-    ## WHY byte TYPE ?????????? AND WHAT IS THAT MASK
-    mask = autograd.Variable(torch.zeros((batch_size, max_seq_len)), volatile = volatile_flag).byte()
+    mask = torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag).byte()
     if label_flag:
         for idx, (seq, label, seqlen) in enumerate(zip(words, labels, word_seq_lengths)):
-            word_seq_tensor[idx, :seqlen] = torch.LongTensor(seq)
-            label_seq_tensor[idx, :seqlen] = torch.LongTensor(label)
-            mask[idx, :seqlen] = torch.Tensor([1]*seqlen)
+            word_seq_tensor[idx, :seqlen] = torch.from_numpy(np.array(seq)).long()
+            label_seq_tensor[idx, :seqlen] = torch.from_numpy(np.array(label)).long()
+            mask[idx, :seqlen] = torch.from_numpy(np.array([1]*seqlen.item())).long()
             
             for idy in range(feature_num):
-                feature_seq_tensors[idy][idx, :seqlen] = torch.LongTensor(features[idx][:, idy])
+                feature_seq_tensors[idy][idx, :seqlen] = torch.from_numpy(np.array(features[idx][:, idy])).long()
             
     else:
         for idx, (seq, seqlen) in enumerate(zip(words, word_seq_lengths)):
-            word_seq_tensor[idx, :seqlen] = torch.LongTensor(seq)
-            mask[idx, :seqlen] = torch.Tensor([1]*seqlen)
+            word_seq_tensor[idx, :seqlen] = torch.from_numpy(np.array(seq)).long()
+            mask[idx, :seqlen] = torch.from_numpy(np.array([1]*seqlen.item())).long()
             
             for idy in range(feature_num):
-                feature_seq_tensors[idy][idx, :seqlen] = torch.LongTensor(features[idx][:, idy])
+                feature_seq_tensors[idy][idx, :seqlen] = torch.from_numpy(np.array(features[idx][:, idy])).long()
             
     word_seq_lengths, word_perm_idx = word_seq_lengths.sort(0, descending = True)
     word_seq_tensor = word_seq_tensor[word_perm_idx]
@@ -179,18 +177,18 @@ def batchify_with_label(input_batch_list, gpu, volatile_flag=False, label_flag=T
     
     ## deal with char (padding)
     # pad_chars (batch_size, max_seq_len)
-    pad_chars = [chars[idx] + [[0]] * (max_seq_len - len(chars[idx])) for idx in range(len(chars))] 
+    pad_chars = [chars[idx] + [[0]] * (max_seq_len.item() - len(chars[idx])) for idx in range(len(chars))] 
     length_list = [list(map(len, pad_char)) for pad_char in pad_chars]
     max_word_len = max(map(max, length_list))
     #print(batch_size, max_seq_len, max_word_len)
-    char_seq_tensor = autograd.Variable(torch.zeros((batch_size, max_seq_len, max_word_len)), volatile = volatile_flag).long()
-    char_seq_lengths = torch.LongTensor(length_list)
+    char_seq_tensor = torch.zeros((batch_size, max_seq_len, max_word_len), dtype = torch.long, requires_grad = volatile_flag)
+    char_seq_lengths = torch.Tensor(length_list).long()
     for idx, (seq, seqlen) in enumerate(zip(pad_chars, char_seq_lengths)):
         for idy, (word, wordlen) in enumerate(zip(seq, seqlen)):
-            char_seq_tensor[idx, idy, :wordlen] = torch.LongTensor(word)
+            char_seq_tensor[idx, idy, :wordlen] = torch.Tensor(word).long()
 
-    char_seq_tensor = char_seq_tensor[word_perm_idx].view(batch_size*max_seq_len, -1)
-    char_seq_lengths = char_seq_lengths[word_perm_idx].view(batch_size*max_seq_len,)
+    char_seq_tensor = char_seq_tensor[word_perm_idx].view(batch_size*max_seq_len.item(), -1)
+    char_seq_lengths = char_seq_lengths[word_perm_idx].view(batch_size*max_seq_len.item(),)
     char_seq_lengths, char_perm_idx = char_seq_lengths.sort(0, descending = True) 
     char_seq_tensor = char_seq_tensor[char_perm_idx]
     _, char_seq_recover = char_perm_idx.sort(0, descending = False)
@@ -377,8 +375,8 @@ def train(data):
             right, whole = predict_check(tag_seq, batch_label, mask)
             right_token += right
             whole_token += whole 
-            sample_loss += loss.data[0]
-            total_loss += loss.data[0]
+            sample_loss += loss.item()
+            total_loss += loss.item()
             if end%500 == 0:
                 temp_time = time.time()
                 temp_cost = temp_time - temp_start

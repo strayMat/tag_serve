@@ -161,7 +161,7 @@ class CRF(nn.Module):
         ### calculate the score from last partition to end state (and then select the STOP_TAG from it)
         last_values = last_partition.expand(batch_size, tag_size, tag_size) + self.transitions.view(1,tag_size, tag_size).expand(batch_size, tag_size, tag_size)
         _, last_bp = torch.max(last_values, 1)
-        pad_zero = autograd.Variable(torch.zeros(batch_size, tag_size)).long()
+        pad_zero = torch.zeros(batch_size, tag_size).long()
         if self.gpu:
             pad_zero = pad_zero.cuda()
         back_points.append(pad_zero)
@@ -179,13 +179,15 @@ class CRF(nn.Module):
         # exit(0)
         back_points = back_points.transpose(1,0).contiguous()
         ## decode from the end, padded position ids are 0, which will be filtered if following evaluation
-        decode_idx = autograd.Variable(torch.LongTensor(seq_len, batch_size))
+        decode_idx = torch.Tensor(seq_len, batch_size).long()
         if self.gpu:
             decode_idx = decode_idx.cuda()
-        decode_idx[-1] = pointer.data
+        #print(pointer)
+        #print(decode_idx[-1].size())
+        decode_idx[-1] = pointer.data.squeeze()
         for idx in range(len(back_points)-2, -1, -1):
             pointer = torch.gather(back_points[idx], 1, pointer.contiguous().view(batch_size, 1))
-            decode_idx[idx] = pointer.data
+            decode_idx[idx] = pointer.data.squeeze()
         path_score = None
         decode_idx = decode_idx.transpose(1,0)
         return path_score, decode_idx
@@ -211,7 +213,7 @@ class CRF(nn.Module):
         seq_len = scores.size(0)
         tag_size = scores.size(2)
         ## convert tag value into a new format, recorded label bigram information to index
-        new_tags = autograd.Variable(torch.LongTensor(batch_size, seq_len))
+        new_tags = torch.Tensor(batch_size, seq_len).long()
         if self.gpu:
             new_tags = new_tags.cuda()
         for idx in range(seq_len):
