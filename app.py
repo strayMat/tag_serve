@@ -1,6 +1,8 @@
 import os
 import sys
 import logging
+import optparse
+
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import spacy
@@ -13,9 +15,18 @@ from nermodel.utils.tokenizer import myTokenizer
 VISU_SERVE = False
 VISU_SAVE = True
 VISU = VISU_SAVE or VISU_SERVE
-LANGUAGE = 'en'
-path2xpt = 'pretrained/baseline.xpt'
-path2model = 'pretrained/baseline.model'
+
+
+# parser
+parser = optparse.OptionParser()
+parser.add_option('-m', '--model', default=os.path.join('pretrained', 'baseline'), help='path/name of the pretrained model to use (default: pretrained/baseline), the conll2003 pretrained model')
+parser.add_option('-l', '--language', default='en', help='Spacy language model for tokenizer (default: en)')
+option, args = parser.parse_args()
+modelpath = option.model
+LANGUAGE = option.language
+
+path2xpt = modelpath+'.xpt'
+path2model = modelpath+'.model'
 
 # define the app
 app = Flask(__name__)
@@ -25,7 +36,7 @@ CORS(app) # cross-domain requests, allow everything by default
 model_api = get_model_api(path2xpt, path2model)
 
 # loading tokenizer once and for all for the api
-app.logger.info('Loading spacy tokenizer...')
+print('Loading spacy tokenizer in '+ LANGUAGE)
 tokenizer = myTokenizer(LANGUAGE)
 
 #STATUS = 'live' # live/file
@@ -58,6 +69,7 @@ def file_api():
             conf = json.loads(request.files["conf"].read())
             VISU_SAVE = conf['visu']
             VISU = VISU_SAVE or VISU_SERVE
+            form = conf['format']
         
         # read the file path
         if request.files.get("file"):
@@ -81,7 +93,10 @@ def file_api():
             for sent, label_seq in zip(text, output_client):
                 for token, label in zip(sent, label_seq):
                     if label != "O":
-                        new_ann = 'T'+str(idx)+'\t'+label[2:]+' '+str(token.idx)+' '+str(token.idx+len(token.string.strip()))+'\t'+token.string.strip()+'\n'
+                        if form == 'brat':
+                            new_ann = 'T'+str(idx)+'\t'+label[2:]+' '+str(token.idx)+' '+str(token.idx+len(token.string.strip()))+'\t'+token.string.strip()+'\n'
+                        else:
+                            new_ann = label[2:]+';'+str(token.idx)+';'+str(token.idx+len(token.string.strip()))+'\n'
                         annotations.append(new_ann)
                         idx+=1
                         if VISU:
