@@ -44,7 +44,7 @@ class CharCNN(nn.Module):
 		char_embeds = char_embeds.transpose(2,1).contiguous()
 		char_cnn_out = self.char_cnn(char_embeds)
 		#print(char_cnn_out.size(2).item())
-		char_cnn_out = F.max_pool1d(char_cnn_out, char_cnn_out.size(2).item()).view(batch_size, -1)
+		char_cnn_out = F.max_pool1d(char_cnn_out, char_cnn_out.size(2)).view(batch_size, -1)
 		return char_cnn_out
 
 	def get_all_hiddens(self, input, seq_lengths):

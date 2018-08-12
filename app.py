@@ -88,19 +88,35 @@ def file_api():
             if VISU:
                 entities = []
             annotations = []
-            idx = 1
+            idx = 0
+            start = -1
+            end = -1
+            entity = None
+            string = None
             text = tokenizer.tokenize(input_data)
             for sent, label_seq in zip(text, output_client):
                 for token, label in zip(sent, label_seq):
                     if label != "O":
-                        if form == 'brat':
-                            new_ann = 'T'+str(idx)+'\t'+label[2:]+' '+str(token.idx)+' '+str(token.idx+len(token.string.strip()))+'\t'+token.string.strip()+'\n'
-                        else:
-                            new_ann = label[2:]+';'+str(token.idx)+';'+str(token.idx+len(token.string.strip()))+'\n'
-                        annotations.append(new_ann)
-                        idx+=1
-                        if VISU:
-                            entities.append({'start':token.idx, 'end':token.idx+len(token.string.strip()), 'label':label[2:]})
+                        if label[0] == 'B':
+                            # add previous entity
+                            if entity is not None:
+                                if form == 'brat':
+                                    new_ann = 'T'+str(idx)+'\t'+entity+' '+str(start)+' '+str(end)+'\t'+string+'\n'
+                                else:
+                                    new_ann = entity+';'+str(start)+';'+str(end)+'\n'
+                                annotations.append(new_ann)
+                                idx+=1
+                                if VISU:
+                                    entities.append({'start':start, 'end':end, 'label':entity})
+                            # re-initalize entity
+                            start = token.idx
+                            end = token.idx + len(token.string.strip())
+                            entity = label[2:]
+                            string = token.string.strip()
+                        elif label[0] == 'I':
+                            end = token.idx + len(token.string.strip())
+                            string += ' '+token.string.strip()
+
             
             html = None
             if VISU:
