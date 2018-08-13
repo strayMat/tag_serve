@@ -66,7 +66,7 @@ def file_api():
         # read configurations for the predict function
         
         if request.files.get('conf'):
-            conf = json.loads(request.files["conf"].read())
+            conf = json.loads(request.files["conf"].read().decode('utf-8'))
             VISU_SAVE = conf['visu']
             VISU = VISU_SAVE or VISU_SERVE
             form = conf['format']
