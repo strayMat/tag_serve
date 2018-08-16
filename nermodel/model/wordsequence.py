@@ -6,8 +6,10 @@ implementation of the sequence neural network architecture (sentences representa
 import torch.nn as nn
 import torch.nn.functional as F 
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-from allennlp.modules.elmo import Elmo, batch_to_ids
-
+try:
+    from allennlp.modules.elmo import Elmo, batch_to_ids
+except:
+    'no allen'
 from .wordrep import WordRep
 
 class WordSequence(nn.Module):
