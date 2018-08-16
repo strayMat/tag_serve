@@ -96,8 +96,11 @@ def file_api():
                 visu_data = [{'text':input_data, 'ents':entities, 'title':None}]
                 html = displacy.render(visu_data, style='ent', page=True, manual=True)
             
-            app.logger.info('First predicted entity: ' + str(annotations[1]))
-            response = jsonify(input_data=input_data, annotations=annotations, html=html)    
+            app.logger.info('First predicted entity: ' + str(annotations[:1]))
+            if form=='min':
+                response = jsonify(annotations=annotations)
+            else:
+                response = jsonify(input_data=input_data, annotations=annotations, html=html)    
             return response
 
 
@@ -119,7 +122,7 @@ def build_ann(sent_list, ann_list, visu = False, form = 'min'):
                         if form == 'brat':
                             new_ann = 'T'+str(idx)+'\t'+entity+' '+str(start)+' '+str(end)+'\t'+string+'\n'
                         elif form == 'min':
-                            new_ann = entity+';'+str(start)+';'+str(end)+'\n'
+                            new_ann = {"type":entity, "begin":start, "end":end}
                         annotations.append(new_ann)
                         idx+=1
                         if visu:
@@ -138,7 +141,7 @@ def build_ann(sent_list, ann_list, visu = False, form = 'min'):
             if form == 'brat':
                 new_ann = 'T'+str(idx)+'\t'+entity+' '+str(start)+' '+str(end)+'\t'+string+'\n'
             elif form == 'min':
-                new_ann = entity+';'+str(start)+';'+str(end)+'\n'
+                new_ann = {"type":entity, "begin":start, "end":end}
             annotations.append(new_ann)
             idx+=1
             if visu:

@@ -11,20 +11,18 @@ parser = optparse.OptionParser()
 parser.add_option('-i', '--input', help='Input folder of input file')
 parser.add_option('-o', '--output', default='output',help='Output folder')
 parser.add_option('-v', '--visu', default=False, action='store_true', help='Save a html visualization for each text (default: do not create visualization)')
-parser.add_option('-f', '--format', default='brat', help='annotation format among [brat, min] (default:brat)')
+#parser.add_option('-f', '--format', default='brat', help='annotation format among [brat, min] (default:brat)')
 
 option, args = parser.parse_args()
 input_dir = option.input
 output_dir = option.output
 VISU_SAVE = str(option.visu)
-form = option.format
+#form = option.format
+form = 'brat'
 
 if option.input is None:
     print('Input file or directory is required')
     exit(0)
-elif option.format not in ['brat', 'min', 'minimal']:
-    print('Wrong format, converted automatically to brat')
-    form = 'brat'
 vis_str = 'with' if option.visu else 'without'
 print('Getting texts in {} and storing results in {} {} html visualizations'.format(option.input, option.output, vis_str))
 
@@ -60,15 +58,15 @@ for path2txt in path2texts:
     payload = {'file':text, 'conf':conf}
     # api processing
     r = requests.post(TORCH_REST_API_URL, files = payload).json()
-    input_data = r['input_data']
     annotations = r['annotations']
-    html = r['html']
     # save results
     if form == 'min':
         path2ann = output_dir+base_name+'.csv'
         with open(path2ann, 'w') as f:
             f.writelines(annotations)
     elif form =='brat':
+        input_data = r['input_data']
+        html = r['html']
         path2txt = output_dir + base_name + '.txt'
         path2ann = output_dir + base_name + '.ann'
         path2html = output_dir + base_name + '.html'
