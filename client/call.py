@@ -16,7 +16,7 @@ parser.add_option('-f', '--format', default='brat', help='annotation format amon
 option, args = parser.parse_args()
 input_dir = option.input
 output_dir = option.output
-VISU_SAVE = option.visu
+VISU_SAVE = str(option.visu)
 form = option.format
 
 if option.input is None:
@@ -39,6 +39,7 @@ if not os.path.isdir(output_dir):
 
 # config 
 conf = json.dumps({"visu":VISU_SAVE, 'format':form})
+#conf = {"visu":VISU_SAVE, 'format':form}
 
 # Get the texts
 path2texts = []
@@ -56,7 +57,7 @@ for path2txt in path2texts:
     base_name = os.path.splitext(os.path.basename(path2txt))[0]
     with open(path2txt, 'r') as f:
      text = f.read()
-    payload = {'file':text, 'filename':base_name, 'conf':conf}
+    payload = {'file':text, 'conf':conf}
     # api processing
     r = requests.post(TORCH_REST_API_URL, files = payload).json()
     input_data = r['input_data']
