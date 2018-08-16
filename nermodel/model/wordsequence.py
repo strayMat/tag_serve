@@ -6,6 +6,7 @@ implementation of the sequence neural network architecture (sentences representa
 import torch.nn as nn
 import torch.nn.functional as F 
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from allennlp.modules.elmo import Elmo, batch_to_ids
 
 from .wordrep import WordRep
 
@@ -20,10 +21,13 @@ class WordSequence(nn.Module):
 		self.lstm_layer = data.HP_lstm_layer
 		self.wordrep = WordRep(data)
 		self.input_size = data.word_emb_dim
+		self.use_elmo = data.use_elmo
 		if self.use_char:
 			self.input_size += data.HP_char_hidden_dim
 			if data.char_feature_extractor == "ALL":
 				self.input_size += data.HP_char_hidden_dim
+		if self.use_elmo:
+			self.input_size += data.elmo_output_dim
 		
 		for idx in range(data.feature_num):
 			self.input_size += data.feature_emb_dims[idx]
