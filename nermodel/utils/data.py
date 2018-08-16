@@ -31,7 +31,6 @@ class Data:
 
         self.label_alphabet = Alphabet('label', True)
         self.tagScheme = 'NoSeg'
-
         self.seg = True
 
         # IO
@@ -39,6 +38,8 @@ class Data:
         self.dev_dir = None
         self.test_dir = None
         self.raw_dir = None
+        self.elmo_opt = None
+        self.elmo_weights = None
 
         self.decode_dir = None
         self.dset_dir = None  # data vocabulary related file
@@ -72,13 +73,15 @@ class Data:
         self.norm_feature_embs = []
         self.word_emb_dim = 50
         self.char_emb_dim = 30
-        # Networks
+        
+        # Network
         self.word_feature_extractor = "LSTM"  # LSTM/CNN/GRU
         self.use_char = True
         self.char_feature_extractor = "CNN"  # LSTM/**CNN**/GRU
         self.use_crf = True
         self.use_feats = False
         self.nbest = None
+        self.use_elmo = False
         # Train
         self.average_batch_loss = False
         self.optimizer = "SGD"
@@ -120,10 +123,13 @@ class Data:
             print(" dev_dir: {}".format(self.dev_dir))
             print(" test_dir: {}".format(self.test_dir))
             print(" raw_dir: {}".format(self.raw_dir))
+            print(" elmo_opt: {}".format(self.elmo_opt))
+            print(" elmo_weights: {}".format(self.elmo_weights))
             print(" dset_dir: {}".format(self.dset_dir))
             print(" word_emb_dir: {}".format(self.word_emb_dir))
             print(" char_emb_dir: {}".format(self.char_emb_dir))
             print(" feature_emb_dirs: {}".format(self.feature_emb_dirs))
+
 
         print('\n')
         print('Network:')
@@ -131,6 +137,7 @@ class Data:
         print(" use_char: {}".format(self.use_char))
         print(" char_feature_extractor: {}".format(self.char_feature_extractor))
         print(" use_crf: {}".format(self.use_crf))
+        print(' use_elmo: {}'.format(self.use_elmo))
         print('\n')
         print('Network Hyperparameters:')
         print(" word_emb_dim: {}".format(self.word_emb_dim))
@@ -423,6 +430,13 @@ class Data:
         the_item = 'load_model_dir'
         if the_item in config:
             self.load_model_dir = config[the_item]
+        the_item = 'elmo_opt'
+        if the_item in config:
+            self.elmo_opt = config[the_item]
+        the_item = 'elmo_weights'
+        if the_item in config:
+            self.elmo_weights = config[the_item]
+
 
         the_item = 'word_emb_dir'
         if the_item in config:
@@ -477,6 +491,9 @@ class Data:
         the_item = 'nbest'
         if the_item in config:
             self.nbest = int(config[the_item])
+        the_item = 'use_elmo'
+        if the_item in config:
+            self.use_elmo = config[the_item]
 
         the_item = 'feature'
         if the_item in config:

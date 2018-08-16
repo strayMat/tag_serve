@@ -11,6 +11,7 @@ import torch.autograd as autograd
 import torch.optim as optim
 import numpy as np
 
+
 #from model.seqmodel import SeqModel
 try:
     from model.seqmodel import SeqModel
@@ -322,6 +323,8 @@ def train(data):
     # save exportable model architecture (for deployment)
     data.save_export(data.model_dir + '.xpt')
     model = SeqModel(data)
+    if data.use_elmo:
+        elmo = Elmo(data.options_file, data.weight_file, 2, dropout=0)
     if data.optimizer.lower() == 'sgd':
         optimizer = optim.SGD(model.parameters(), lr=data.HP_lr, momentum=data.HP_momentum, weight_decay=data.HP_l2)
     elif data.optimizer.lower() == 'adagrad':
@@ -363,9 +366,14 @@ def train(data):
             if end > train_num:
                 end = train_num
             instance = data.train_Ids[start:end]
+            instance_texts = data.train_texts[start:end]
             if not instance:
                 continue
+            elmo_embs = None
+            if data.use_elmo:
+                elmo_embs = elmo(batch_to_ids(instance_texts))
             batch_word, batch_features, batch_wordlen, batch_wordrecover, batch_char, batch_charlen, batch_charrecover, batch_label, mask = batchify_with_label(instance, data.HP_gpu, volatile_flag = False, label_flag = True)
+            
             #print(batch_char.size())
             #print(batch_char.max())
             instance_count += 1
