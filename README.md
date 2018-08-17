@@ -7,15 +7,15 @@ The `tag_serve` repo adapts the ner model from [NCRF++](https://github.com/jiesu
 
 ## Installing from source
 
-You can also install tag_serve from source by cloning our git repository:
+You can install `tag_serve` from source by cloning the git repository:
 
 `git clone https://github.com/strayMat/tag_serve.git`
 
 Create a Python 3.6 virtual environment, and install the necessary requirements by running:
 
 `scripts/install_requirements.sh`
+(Add FR_MODEL=true before the script if you want to load the spacy language modele for french)
 
-Add FR_MODEL=true before the script if you want to load the spacy language modele for french.
 ## Call the API
 
 ### Launch API and web demo locally
@@ -27,7 +27,6 @@ Add FR_MODEL=true before the script if you want to load the spacy language model
 
 + Launch the API: `python app.py`
 + Launch call function: `python client/call.py -i decoding/ins/ -o decoding/outs/`
-
 (add `-v` to get visualization `.html`: `python client/call.py -i decoding/ins/ -o decoding/outs/ -v`)
 
 ### With a curl command
@@ -54,9 +53,9 @@ Run the docker with :
 
 `sudo docker run -d -p 5000:5000 --name tagger yourTag python3 /app/app.py`
 
-You can now access the docker with the previous call to the API (`client/call.py`, `client/predict_client.html` or `curl`)
+You can now access the docker API with the call methods of your choice (`client/call.py`, `client/predict_client.html` or `curl`)
 
-## Train your model
+## Train your own model
 Go see the demonstration notebook: [train_decode_template.ipynb](https://github.com/strayMat/tag_serve/blob/master/nermodel/train_decode_template.ipynb)
 
 ## References:
