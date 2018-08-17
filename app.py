@@ -62,7 +62,8 @@ def file_api():
         VISU = False
         # Loading data
         data = request.json
-        print(data)
+        input_data = None
+        conf = None
         # If requested by python.requests.post (from call.py)
         if data == None:
             data = request.files
@@ -71,9 +72,9 @@ def file_api():
         else:
             input_data = data["file"]
         # read configurations for the predict function
-        if "conf" in data:
+        if conf is not None:            
             if conf['visu'].lower() == "true":
-                VISU == True
+                VISU = True
             if conf['format'].lower() == 'brat':
                 form = 'brat'
         # read file for the predict function      

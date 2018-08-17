@@ -37,7 +37,7 @@ def get_model_api(path2xpt, path2model):
             print('EMPTY TOKENIZER! please specify a tokenizer...')
             exit(1)
         
-        ## Pre-processing from client, very delicate (we have to keep the same tokenization for the model input and for the spans at the output
+        ## Pre-processing from client, very delicate (we have to keep the same tokenization for the model input and for the spans at the output ('\t\t*', '\ n\n*') have to be removed from the tokenized input
         text = tokenizer.tokenize(input_data)
         input_client = []
         input_model = []

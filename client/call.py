@@ -11,23 +11,21 @@ parser = optparse.OptionParser()
 parser.add_option('-i', '--input', help='Input folder of input file')
 parser.add_option('-o', '--output', default='output',help='Output folder')
 parser.add_option('-v', '--visu', default=False, action='store_true', help='Save a html visualization for each text (default: do not create visualization)')
-#parser.add_option('-f', '--format', default='brat', help='annotation format among [brat, min] (default:brat)')
+parser.add_option('-f', '--format', default='brat', help='annotation format among [brat, min] (default:brat)')
 
 option, args = parser.parse_args()
 input_dir = option.input
 output_dir = option.output
-VISU_SAVE = str(option.visu)
-#form = option.format
-form = 'brat'
+VISU = str(option.visu)
+print(VISU)
+form = option.format
+#form = 'brat'
 
 if option.input is None:
     print('Input file or directory is required')
     exit(0)
-vis_str = 'with' if option.visu else 'without'
-print('Getting texts in {} and storing results in {} {} html visualizations'.format(option.input, option.output, vis_str))
-
-#input_dir = 'prod_data/inputs/'
-#output_dir = 'prod_data/out/'
+vis_str = 'with html visualizations' if option.visu else ''
+print('Getting texts in {} and storing results in {} {}'.format(option.input, option.output, vis_str))
 
 # api url
 TORCH_REST_API_URL = "http://localhost:5000/predict"
@@ -36,8 +34,7 @@ if not os.path.isdir(output_dir):
     print("Created output directory : ", output_dir)
 
 # config 
-conf = json.dumps({"visu":VISU_SAVE, 'format':form})
-#conf = {"visu":VISU_SAVE, 'format':form}
+conf = json.dumps({"visu":VISU, 'format':form})
 
 # Get the texts
 path2texts = []
@@ -61,6 +58,7 @@ for path2txt in path2texts:
     annotations = r['annotations']
     # save results
     if form == 'min':
+        annotations = [str(ann) for ann in annotations]
         path2ann = output_dir+base_name+'.csv'
         with open(path2ann, 'w') as f:
             f.writelines(annotations)
