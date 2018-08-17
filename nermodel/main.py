@@ -2,7 +2,7 @@ from utils.data import Data
 from ner_model import train, data_initialization, load_model_decode
 import torch
 
-def myTrain(confdict):
+def easyTrain(confdict):
 	print('Model Train')
 	data = Data()
 	data.read_config(confdict)
@@ -16,7 +16,7 @@ def myTrain(confdict):
 	return f1
 
 # decoding with a test file containing labels (test purpose usually)
-def myDecode(confdict, verbose=True):
+def easyDecode(confdict, verbose=True):
 	data = Data()
 	data.read_config(confdict)
 	print('Model Decode')

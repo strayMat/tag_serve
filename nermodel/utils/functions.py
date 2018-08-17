@@ -229,3 +229,46 @@ def load_pretrain_emb(embedding_path):
 				first_col = tokens[0]
 			embedd_dict[first_col] = embedd
 	return embedd_dict, embedd_dim
+
+def build_ann(sent_list, ann_list, visu = False, form = 'min'):
+    entities = []
+    annotations = []
+    idx = 0
+    start = -1
+    end = -1
+    entity = None
+    string = None            
+    for sent, label_seq in zip(sent_list, ann_list):
+        for token, label in zip(sent, label_seq):
+            if label != "O":
+                if label[0] == 'B':
+                    # add previous entity
+                    if entity is not None:
+                        if form == 'brat':
+                            new_ann = 'T'+str(idx)+'\t'+entity+' '+str(start)+' '+str(end)+'\t'+string+'\n'
+                        elif form == 'min':
+                            new_ann = {"type":entity, "begin":start, "end":end}
+                        annotations.append(new_ann)
+                        idx+=1
+                        if visu:
+                            entities.append({'start':start, 'end':end, 'label':entity})
+                    # re-initalize entity
+                    start = token.idx
+                    end = token.idx + len(token.string.strip())
+                    entity = label[2:]
+                    string = token.string.strip()
+                elif label[0] == 'I':
+                    end = token.idx + len(token.string.strip())
+                    string += ' '+token.string.strip()
+    # end of the loop
+    if start !=-1:
+        if entity is not None:
+            if form == 'brat':
+                new_ann = 'T'+str(idx)+'\t'+entity+' '+str(start)+' '+str(end)+'\t'+string+'\n'
+            elif form == 'min':
+                new_ann = {"type":entity, "begin":start, "end":end}
+            annotations.append(new_ann)
+            idx+=1
+            if visu:
+                entities.append({'start':start, 'end':end, 'label':entity})
+    return annotations, entities

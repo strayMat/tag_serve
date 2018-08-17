@@ -22,6 +22,8 @@ def get_model_api(path2xpt, path2model):
     data.load_export(path2xpt)
     data.read_config(decode_config_dict)
     data.HP_gpu = torch.cuda.is_available()
+    # set high length of sentence
+    data.MAX_SENTENCE_LENGTH = 2500
     if VERBOSE:
         data.show_data_summary(deploy = True)
     

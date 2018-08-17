@@ -16,7 +16,7 @@ PADDING = "</pad>"
 class Data:
 
     def __init__(self):
-        self.MAX_SENTENCE_LENTGH = 1000
+        self.MAX_SENTENCE_LENGTH = 1000
         self.MAX_WORD_LENGTH = -1
         self.number_normalized = False
         self.norm_word_emb = False
@@ -108,7 +108,7 @@ class Data:
         print("----------Data summary:----------\n")
 
         print(" HP_gpu: {}".format(self.HP_gpu))
-        print(" MAX_SENTENCE_LENTGH: {}".format(self.MAX_SENTENCE_LENTGH))
+        print(" MAX_SENTENCE_LENGTH: {}".format(self.MAX_SENTENCE_LENGTH))
         print(" number_normalized: {}".format(self.number_normalized))
         print(" word_alphabet: {}".format(self.word_alphabet_size))
         print(" char_alphabet_size: {}".format(self.char_alphabet_size))
