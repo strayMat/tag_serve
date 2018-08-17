@@ -13,8 +13,7 @@ You can install `tag_serve` from source by cloning the git repository:
 
 Create a Python 3.6 virtual environment, and install the necessary requirements by running:
 
-`scripts/install_requirements.sh`
-(Add FR_MODEL=true before the script if you want to load the spacy language modele for french)
+`./src/install_requirements.sh`
 
 ## Call the API
 
