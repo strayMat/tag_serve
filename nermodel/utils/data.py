@@ -170,16 +170,16 @@ class Data:
         self.fix_alphabet()
         if name == 'train':
             self.train_texts, self.train_Ids = read_instance(
-                self.train_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENTGH)
+                self.train_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENGTH)
         elif name == 'dev':
             self.dev_texts, self.dev_Ids = read_instance(
-                self.dev_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENTGH)
+                self.dev_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENGTH)
         elif name == 'test':
             self.test_texts, self.test_Ids = read_instance(
-                self.test_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENTGH)
+                self.test_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENGTH)
         elif name == 'raw':
             self.raw_texts, self.raw_Ids = read_instance(
-                self.raw_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENTGH)
+                self.raw_dir, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENGTH)
         else:
             print('Error: you can only generate from train/dev/test/raw')
 
@@ -188,7 +188,7 @@ class Data:
         self.fix_alphabet()
         # input in raw data
         self.raw_texts, self.raw_Ids = read_instance_from_list(
-            input_data, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENTGH)
+            input_data, self.word_alphabet, self.char_alphabet, self.label_alphabet, self.feature_alphabets, self.number_normalized, self.MAX_SENTENCE_LENGTH)
 
     def fix_alphabet(self):
         self.word_alphabet.close()
