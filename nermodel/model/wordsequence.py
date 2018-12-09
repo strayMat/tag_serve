@@ -6,10 +6,6 @@ implementation of the sequence neural network architecture (sentences representa
 import torch.nn as nn
 import torch.nn.functional as F 
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-try:
-    from allennlp.modules.elmo import Elmo, batch_to_ids
-except:
-    'no allen'
 from .wordrep import WordRep
 
 class WordSequence(nn.Module):
@@ -23,14 +19,10 @@ class WordSequence(nn.Module):
 		self.lstm_layer = data.HP_lstm_layer
 		self.wordrep = WordRep(data)
 		self.input_size = data.word_emb_dim
-		self.use_elmo = data.use_elmo
 		if self.use_char:
 			self.input_size += data.HP_char_hidden_dim
 			if data.char_feature_extractor == "ALL":
 				self.input_size += data.HP_char_hidden_dim
-		if self.use_elmo:
-			self.input_size += data.elmo_output_dim
-		
 		for idx in range(data.feature_num):
 			self.input_size += data.feature_emb_dims[idx]
 		
@@ -46,7 +38,7 @@ class WordSequence(nn.Module):
 			self.lstm = nn.LSTM(self.input_size, lstm_hidden, num_layers = self.lstm_layer, batch_first = True, bidirectional = self.bilstm_flag)
 		## A priori LSTM is the only necessary condition for our choices of model
 		elif self.word_feature_extractor == "CNN":
-			self.word2cnn == nn.Linear(self.input_size, data.HP_hidden_dim)
+			self.word2cnn = nn.Linear(self.input_size, data.HP_hidden_dim)
 			self.cnn_layer = data.HP_cnn_layer
 			print("CNN layer: ", self.cnn_layer)
 			self.cnn_list = nn.ModuleList()
@@ -56,7 +48,7 @@ class WordSequence(nn.Module):
 			pad_size = (kernel-1)/2
 			for idx in range (self.cnn_layer):
 				self.cnn_list.append(nn.Conv1d(data.HP_hidden_dim, data.HP_hidden_dim, kernel_size = kernel, padding = pad_size))
-				self.cnn_drop_list.append(nn.BatchNorm1d(data.HP_dropout))
+				self.cnn_drop_list.append(nn.Dropout(data.HP_dropout))
 				self.cnn_batchnorm_list.append(nn.BatchNorm1d(data.HP_hidden_dim))
 		self.hidden2tag = nn.Linear(data.HP_hidden_dim, data.label_alphabet_size)
 

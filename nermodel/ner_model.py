@@ -143,7 +143,7 @@ def batchify_with_label(input_batch_list, gpu, volatile_flag=False, label_flag=T
     
     feature_seq_tensors = []
     for idx in range(feature_num):
-        feature_seq_tensors.append(torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag)).long()
+        feature_seq_tensors.append(torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag).long())
     
     mask = torch.zeros((batch_size, max_seq_len), requires_grad = volatile_flag).byte()
     if label_flag:
@@ -323,8 +323,6 @@ def train(data):
     # save exportable model architecture (for deployment)
     data.save_export(data.model_dir + '.xpt')
     model = SeqModel(data)
-    if data.use_elmo:
-        elmo = Elmo(data.options_file, data.weight_file, 2, dropout=0)
     if data.optimizer.lower() == 'sgd':
         optimizer = optim.SGD(model.parameters(), lr=data.HP_lr, momentum=data.HP_momentum, weight_decay=data.HP_l2)
     elif data.optimizer.lower() == 'adagrad':
@@ -369,9 +367,6 @@ def train(data):
             instance_texts = data.train_texts[start:end]
             if not instance:
                 continue
-            elmo_embs = None
-            if data.use_elmo:
-                elmo_embs = elmo(batch_to_ids(instance_texts))
             batch_word, batch_features, batch_wordlen, batch_wordrecover, batch_char, batch_charlen, batch_charrecover, batch_label, mask = batchify_with_label(instance, data.HP_gpu, volatile_flag = False, label_flag = True)
             
             #print(batch_char.size())
@@ -460,7 +455,7 @@ def save_infos(data, dev_res, path2info):
     
     'train': ['batch_size', 'iteration', 'optimizer', 'HP_lr', 'HP_lr_decay', 'HP_momentum', 'HP_l2','HP_clip'],
     
-    'others':['MAX_SENTENCE_LENTGH', 'HP_gpu', 'number_normalized']
+    'others':['MAX_SENTENCE_LENGTH', 'HP_gpu', 'number_normalized']
     }
 
     # input parameters in infos dict

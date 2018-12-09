@@ -220,7 +220,7 @@ class Data:
                         self.feature_name[idx]]['emb_size']
                     self.feature_emb_dirs[idx] = self.feat_config[
                         self.feature_name[idx]]['emb_dir']
-                    self.norm_emb_embs[idx] = self.feat_config[
+                    self.norm_feature_embs[idx] = self.feat_config[
                         self.feature_name[idx]]['emb_norm']
 
     def build_alphabet(self, input_file):
